@@ -14,7 +14,6 @@ import dev.badbird.desfire.objects.nfc.*
 import dev.badbird.desfire.objects.nfc.lum.LumCard
 import dev.badbird.desfire.objects.nfc.lum.LumCard.Companion.f6793b
 import dev.badbird.desfire.objects.nfc.lum.mifareUltralight
-import dev.badbird.desfire.utils.Callback
 
 /* compiled from: NfcHandler */
 class NFCHandler(
@@ -48,9 +47,8 @@ class NFCHandler(
                         prestoCard.type = CardType.PRESTO
                         prestoCard.reader = nfcCardReader
 
-                        val bytes = 60.toByte()
-                        val barr = nfcCardReader.execRaw(byteArrayOf(bytes))
-                        callback.run(barr)
+                        val array2: ByteArray? = nfcCardReader.executeCommand(96.toByte(), null, 0, 0)
+                        callback.run(array2)
                     } else {
                         Log.d("NFCHandler", "Unsupported card detected!!")
                         prestoCard = PrestoCard.getCard()!!
@@ -60,21 +58,26 @@ class NFCHandler(
                     if (prestoCard == null || prestoCard.type !== CardType.PRESTO) {
 //                        CardNumberData.getCardNumberDataInstance().setPrestoCard(false)
                         CardNumberData.cardNumberDataInstance?.isPrestoCard = false
-                    } else if (prestoCard.checkLumCard()) {
-                        val aVar: PrestoCard = this.card as PrestoCard
-                        val j2: Long = aVar.f5883f!!.f5865b
-                        val j3: Long = aVar.f5883f!!.f5865b
-                        if (this.c) {
+                    } else {
+                        Log.d("NFCHandler", "Checking if it is a presto card")
+                        if (prestoCard.checkPrestoCard()) {
+                            val aVar: PrestoCard = this.card as PrestoCard
+                            val j2: Long = aVar.f5883f!!.f5865b
+                            val j3: Long = aVar.f5883f!!.f5865b
+                            Log.d("NFCHandler", "Is also a presto card!")
+                            Log.d("NFCHandler", "J2: $j2 | J3: $j3")
+                            if (this.c) {
 //                            CardNumberData.getCardNumberDataInstance().setCardNumber(j2)
 //                            CardNumberData.getCardNumberDataInstance().setLumCard(false)
 //                            CardNumberData.getCardNumberDataInstance().setPrestoCard(true)
-                            CardNumberData.cardNumberDataInstance?.cardNumber = j2
-                            CardNumberData.cardNumberDataInstance?.isLumCard = false
-                            CardNumberData.cardNumberDataInstance?.isPrestoCard = true
+                                CardNumberData.cardNumberDataInstance?.cardNumber = j2
+                                CardNumberData.cardNumberDataInstance?.isLumCard = false
+                                CardNumberData.cardNumberDataInstance?.isPrestoCard = true
+                            }
                         }
                     }
                 } else if (i2 == 1) {
-                    Log.d("NFCHandler", "Is LUM card")
+                    Log.d("NFCHandler", "Is possible LUM card")
                     if (f6793b == null) {
                         f6793b = LumCard()
                     }
@@ -95,6 +98,10 @@ class NFCHandler(
                     CardNumberData.cardNumberDataInstance?.cardNumber = a2!!
                     CardNumberData.cardNumberDataInstance?.isPrestoCard = false
                     CardNumberData.cardNumberDataInstance?.isLumCard = true
+                    Toast.makeText(ctx, "LUM card detected!!", Toast.LENGTH_SHORT).show()
+                    Log.d("NFCHandler", "LUM card info:")
+                    Log.d("NFCHandler", "Card number: $a2")
+                    Log.d("NFCHandler", "LUM type: $a3")
                     if (a3 != null) {
                         bundle.putLong("lum type", a3)
                     }
@@ -102,8 +109,6 @@ class NFCHandler(
             } catch (exception: Exception) {
                 bundle.putString("SCREEN_NAME", "NFCHandler Exception")
                 throw exception
-            } catch (e2: Exception) {
-                e2.message
             }
         }
     }
