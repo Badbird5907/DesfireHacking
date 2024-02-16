@@ -18,7 +18,8 @@ import dev.badbird.desfire.objects.nfc.lum.mifareUltralight
 /* compiled from: NfcHandler */
 class NFCHandler(
     private val ctx: Context,
-    private val callback: dev.badbird.desfire.utils.Callback<ByteArray?>
+    private val callback: dev.badbird.desfire.utils.Callback<ByteArray?>,
+    private val updateCallback: Runnable
 ) : Handler() {
     var cardReader: NFCCardReader? = null
 
@@ -26,6 +27,16 @@ class NFCHandler(
     var card: Card? = null
     var c = true
 
+
+    fun testVer() {
+        try {
+            val array2: ByteArray? = cardReader?.executeCommand(96.toByte(), null, 0, 0)
+            callback.run(array2)
+        } catch (e: Exception) {
+            e.printStackTrace()
+            callback.run(null)
+        }
+    }
     override fun handleMessage(message: Message) {
         val prestoCard: PrestoCard?
         if (message.obj != null) {
@@ -47,12 +58,13 @@ class NFCHandler(
                         prestoCard.type = CardType.PRESTO
                         prestoCard.reader = nfcCardReader
 
-                        val array2: ByteArray? = nfcCardReader.executeCommand(96.toByte(), null, 0, 0)
-                        callback.run(array2)
+                        testVer()
+                        updateCallback.run()
                     } else {
                         Log.d("NFCHandler", "Unsupported card detected!!")
                         prestoCard = PrestoCard.getCard()!!
                         prestoCard.type = CardType.UNSUPPORTED
+                        updateCallback.run()
                     }
                     this.card = prestoCard
                     if (prestoCard == null || prestoCard.type !== CardType.PRESTO) {
@@ -73,7 +85,10 @@ class NFCHandler(
                                 CardNumberData.cardNumberDataInstance?.cardNumber = j2
                                 CardNumberData.cardNumberDataInstance?.isLumCard = false
                                 CardNumberData.cardNumberDataInstance?.isPrestoCard = true
+                                updateCallback.run()
                             }
+                        } else {
+                            Log.d("NFCHandler", "Doesn't respond like a presto card!")
                         }
                     }
                 } else if (i2 == 1) {
@@ -102,6 +117,8 @@ class NFCHandler(
                     Log.d("NFCHandler", "LUM card info:")
                     Log.d("NFCHandler", "Card number: $a2")
                     Log.d("NFCHandler", "LUM type: $a3")
+                    testVer()
+                    updateCallback.run()
                     if (a3 != null) {
                         bundle.putLong("lum type", a3)
                     }

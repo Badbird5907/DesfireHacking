@@ -20,7 +20,8 @@ import java.util.*
 /* compiled from: NFCDiscoveryImpl */
 class NFCDiscoveryImpl(
     private val ctx: Context,
-    private val cb: Callback<ByteArray?>
+    private val cb: Callback<ByteArray?>,
+    private val rb: Runnable
 ) : Thread() {
     /* renamed from: e  reason: collision with root package name */
     var f5870e: NfcAdapter? = null
@@ -160,12 +161,12 @@ class NFCDiscoveryImpl(
 
     fun f(activity: Activity) {
         val intent = Intent(activity.applicationContext, activity.javaClass)
-        intent.setFlags(536870912)
+        intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
         val activity2 = PendingIntent.getActivity(
             activity.applicationContext,
             0,
             intent,
-            if (Build.VERSION.SDK_INT >= 31) 33554432 else 0
+            PendingIntent.FLAG_MUTABLE
         )
         val intentFilterArr = arrayOf(IntentFilter())
         intentFilterArr[0].addAction("android.nfc.action.TECH_DISCOVERED")
@@ -186,7 +187,7 @@ class NFCDiscoveryImpl(
 
     override fun run() {
         Looper.prepare()
-        this.f5873n = NFCHandler(ctx, cb)
+        this.f5873n = NFCHandler(ctx, cb, rb)
         Looper.loop()
     }
 
@@ -209,11 +210,11 @@ class NFCDiscoveryImpl(
             return String(cArr)
         }
 
-        fun c(ctx: Context, cb: Callback<ByteArray?>): NFCDiscoveryImpl {
+        fun c(ctx: Context, cb: Callback<ByteArray?>, rb: Runnable): NFCDiscoveryImpl {
             if (f5868b == null) {
                 // i.b() - some watchdog function
                 // b.g.a.a.a.e0.k.h.Companion.f5868b = b.g.a.a.a.e0.k.h()
-                f5868b = NFCDiscoveryImpl(ctx,cb)
+                f5868b = NFCDiscoveryImpl(ctx,cb, rb)
             }
             return f5868b!!
         }

@@ -14,19 +14,25 @@ import android.os.Message
 import android.util.Log
 import android.widget.TextView
 import android.widget.Toast
+import dev.badbird.desfire.objects.CardNumberData
+import dev.badbird.desfire.objects.PrestoCard
 import dev.badbird.desfire.utils.Callback
 import java.io.IOException
 
 class DesfireReadActivity : Activity() {
     private lateinit var versionTextView: TextView
+    private lateinit var cardTypeTextView: TextView
+    private lateinit var cardNumberTextView: TextView
     private lateinit var nfcAdapter: NfcAdapter
-    var f5873n: NFCHandler? = null
+    var nfcHandler: NFCHandler? = null // f5873n
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_desfire_read_version)
+        setContentView(R.layout.activity_desfire_read)
 
         versionTextView = findViewById(R.id.versionTextView)
+        cardTypeTextView = findViewById(R.id.cardTypeTextView)
+        cardNumberTextView = findViewById(R.id.cardNumberTextView)
         nfcAdapter = NfcAdapter.getDefaultAdapter(this)
 
         if (nfcAdapter == null) {
@@ -40,18 +46,29 @@ class DesfireReadActivity : Activity() {
         }
 
 
-        this.f5873n = NFCHandler(this, object : Callback<ByteArray?> {
+        this.nfcHandler = NFCHandler(this, object : Callback<ByteArray?> {
             override fun run(t: ByteArray?) {
                 Log.d("DesfireReadVersion", "Callback run")
                 if (t != null) {
                     Log.d("DesfireReadVersion", "bArr is not null")
-                    versionTextView.text = "Desfire version: ${t.contentToString()}"
+                    versionTextView.text = getString(R.string.card_version, t.contentToString())
                 } else {
-                    Log.d("DesfireReadVersion", "bArr is null")
-                    versionTextView.text = "Error reading Desfire version"
+                    versionTextView.text = getString(R.string.error_reading_version)
                 }
             }
-        })
+        }) {
+            Log.d("DesfireReadVersion", "Update callback run")
+            val card = nfcHandler?.card
+            if (card != null) {
+                cardTypeTextView.text = getString(R.string.card_type, card.type)
+            } else {
+                cardTypeTextView.text = getString(R.string.card_type, "Unknown")
+            }
+
+            if (CardNumberData.cardNumberDataInstance != null) {
+                cardNumberTextView.text = getString(R.string.card_number, CardNumberData.cardNumberDataInstance?.cardNumber ?: "Unknown")
+            }
+        }
         Toast.makeText(this, "NFC is enabled", Toast.LENGTH_SHORT).show()
     }
 
@@ -117,10 +134,10 @@ class DesfireReadActivity : Activity() {
                 if (listOf(*techList).contains(IsoDep::class.java.name)) {
                     val isoDep = IsoDep.get(tag)
                     // this.f5871g = isoDep
-                    message = this.f5873n?.obtainMessage(0, isoDep)
+                    message = this.nfcHandler?.obtainMessage(0, isoDep)
                 } else {
                     if (listOf(*techList).contains(MifareUltralight::class.java.name)) {
-                        message = this.f5873n?.obtainMessage(1, MifareUltralight.get(tag))
+                        message = this.nfcHandler?.obtainMessage(1, MifareUltralight.get(tag))
                     }
                     // message = null
                 }
@@ -129,7 +146,7 @@ class DesfireReadActivity : Activity() {
             }
             try {
                 if (message != null) {
-                    this.f5873n?.sendMessage(message)
+                    this.nfcHandler?.sendMessage(message)
                 }
             } catch (unused: Exception) {
                 if (message != null) {

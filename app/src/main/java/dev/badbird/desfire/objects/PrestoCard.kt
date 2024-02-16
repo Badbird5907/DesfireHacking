@@ -91,9 +91,12 @@ class PrestoCard : DESFireCard() {
                     }
                     b5 = false
                 }
+                /*
                 if (!b5) {
                     return false
                 }
+                 */
+                Log.d("PrestoCard", "Check passed run blocks")
                 this.f5883f = CardHeader(this.desfireFile?.data!!)
                 if (!super.reader?.checkIfPrestoCard(byteArrayOf(0, 32, 0))!!) {
                     return false

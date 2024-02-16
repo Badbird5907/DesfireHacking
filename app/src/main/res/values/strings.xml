@@ -1,3 +1,8 @@
 <resources>
     <string name="app_name">DesfireHacking</string>
+    <string name="card_type">Card Type: %1$s</string>
+    <string name="desfire_version">Desfire version:</string>
+    <string name="error_reading_version">Error reading card version (0x60)</string>
+    <string name="card_version">Version: %1$s</string>
+    <string name="card_number">Card Number: %1$s</string>
 </resources>
