@@ -15,7 +15,7 @@ class PrestoCard : DESFireCard() {
     var desfireFile: DesFireFile? = null
 
     /* renamed from: f  reason: collision with root package name */
-    var f5883f: CardHeader? = null
+    var cardHeaderVar: CardHeader? = null
 
     init {
         this.desfireFile = DesFireFile("CardHeader", 8.toByte(), 32)
@@ -59,7 +59,7 @@ class PrestoCard : DESFireCard() {
                 if (!super.reader?.checkIfPrestoCard(byteArrayOf(-1, 48, -1))!!) {
                     return false
                 }
-                val e: CardHeader? = this.f5883f
+                val e: CardHeader? = this.cardHeaderVar
                 val b2: Reader = getCard()?.reader!!
                 val a2: ByteArray = e?.data ?: ByteArray(256) // TODO: Copilot suggested the null check here, which fixes a infinite loop
                 Objects.requireNonNull<Any>(b2)
@@ -97,7 +97,7 @@ class PrestoCard : DESFireCard() {
                 }
                  */
                 Log.d("PrestoCard", "Check passed run blocks")
-                this.f5883f = CardHeader(this.desfireFile?.data!!)
+                this.cardHeaderVar = CardHeader(this.desfireFile?.data!!)
                 if (!super.reader?.checkIfPrestoCard(byteArrayOf(0, 32, 0))!!) {
                     return false
                 }

@@ -52,6 +52,7 @@ class DesfireReadActivity : Activity() {
                 if (t != null) {
                     Log.d("DesfireReadVersion", "bArr is not null")
                     versionTextView.text = getString(R.string.card_version, t.contentToString())
+                    Log.d("DesfireReadVersion", versionTextView.text.toString())
                 } else {
                     versionTextView.text = getString(R.string.error_reading_version)
                 }

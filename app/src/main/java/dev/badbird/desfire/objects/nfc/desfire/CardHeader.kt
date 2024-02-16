@@ -9,7 +9,7 @@ class CardHeader(var data: ByteArray) {
     val MAX_URL_LENGTH: Int = 2000
 
     /* renamed from: b  reason: collision with root package name */
-    var f5865b: Long
+    var cardNumber: Long
 
     init {
         m(data, 0, 10)
@@ -21,7 +21,7 @@ class CardHeader(var data: ByteArray) {
         m(data, 57, 8)
         m(data, 65, 12)
         m(data, 77, 6)
-        this.f5865b = m(data, 83, 26)
+        this.cardNumber = m(data, 83, 26)
         m(data, 109, 6)
         try {
             val m2: Long = m(data, 115, 16)

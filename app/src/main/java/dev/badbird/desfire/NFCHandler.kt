@@ -74,15 +74,15 @@ class NFCHandler(
                         Log.d("NFCHandler", "Checking if it is a presto card")
                         if (prestoCard.checkPrestoCard()) {
                             val aVar: PrestoCard = this.card as PrestoCard
-                            val j2: Long = aVar.f5883f!!.f5865b
-                            val j3: Long = aVar.f5883f!!.f5865b
+                            val cardNumber: Long = aVar.cardHeaderVar!!.cardNumber
+                            val j3: Long = aVar.cardHeaderVar!!.cardNumber
                             Log.d("NFCHandler", "Is also a presto card!")
-                            Log.d("NFCHandler", "J2: $j2 | J3: $j3")
+                            Log.d("NFCHandler", "J2: $cardNumber | J3: $j3")
                             if (this.c) {
 //                            CardNumberData.getCardNumberDataInstance().setCardNumber(j2)
 //                            CardNumberData.getCardNumberDataInstance().setLumCard(false)
 //                            CardNumberData.getCardNumberDataInstance().setPrestoCard(true)
-                                CardNumberData.cardNumberDataInstance?.cardNumber = j2
+                                CardNumberData.cardNumberDataInstance?.cardNumber = cardNumber
                                 CardNumberData.cardNumberDataInstance?.isLumCard = false
                                 CardNumberData.cardNumberDataInstance?.isPrestoCard = true
                                 updateCallback.run()
