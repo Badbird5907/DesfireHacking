@@ -138,6 +138,9 @@ class DesfireReadActivity : Activity() {
                 } else {
                     if (listOf(*techList).contains(MifareUltralight::class.java.name)) {
                         message = this.nfcHandler?.obtainMessage(1, MifareUltralight.get(tag))
+                    } else {
+                        Log.e("DesfireReadVersion", "No supported tech found")
+                        Toast.makeText(this, "Not a supported card!", Toast.LENGTH_SHORT).show()
                     }
                     // message = null
                 }
